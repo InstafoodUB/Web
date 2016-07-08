@@ -21,7 +21,43 @@ Released   : 20140225
 <link href="fonts.css" rel="stylesheet" type="text/css" media="all" />
 
 <!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+    <style>
+      html, body, #map {
+        height: 97%;
+        padding: 0;
+        margin: 0;
+      }
+      #layer_selector {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 0;
+      }
+      #layer_selector ul {
+        padding: 0; margin: 0;
+        list-style-type: none;
+      }
+      #layer_selector li {
+        border-bottom: 1px solid #999;
+        padding: 15px 30px;
+        font-family: "Helvetica", Arial;
+        font-size: 13px;
+        color: #444;
+        cursor: auto;
+      }
+      #layer_selector li:hover {
+        background-color: #F0F0F0;
+        cursor: pointer;
+      }
+      #layer_selector li.selected {
+        background-color: #EEE;
+      }
+    </style>
 
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
 </head>
 <body>
 <div id="header-wrapper">
@@ -54,7 +90,63 @@ Released   : 20140225
 			<div class="title">
 				<h2>Welcome to our website</h2>
 				<span class="byline">Mauris vulputate dolor sit amet nibh</span> </div>
-			<p><img src="images/banner.jpg" alt="" class="image image-full" /> </p>
+			<p> <div id="map"></div>
+    <div id="layer_selector" class="cartodb-infobox">
+      <ul>
+        <li data="all" class="selected">All restaurants</li>
+        <li data="1000">Carns i brases</li>
+        <li data="6000">Tapes i platillos</li>
+        <li data="10000">Asiatic</li>
+        <li data="50000">Casolana</li>
+        <li data="50000">Italiana</li>
+        <li data="50000">Menjar rapid</li>
+        <li data="50000">Verda</li>
+        <li data="50000">Paelles i arros</li>
+      </ul>
+    </div>
+
+    <!-- include cartodb.js library -->
+    <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+
+    <script>
+      // create layer selector
+      function createSelector(layer) {
+        var sql = new cartodb.SQL({ user: 'documentation' });
+        var $options = $('#layer_selector li');
+        $options.click(function(e) {
+          // get the area of the selected layer
+          var $li = $(e.target);
+          var area = $li.attr('data');
+          // deselect all and select the clicked one
+          $options.removeClass('selected');
+          $li.addClass('selected');
+          // create query based on data from the layer
+          var query = "select * from european_countries_e";
+          if(area !== 'all') {
+            query = "select * from european_countries_e where area > " + area;
+          }
+          // change the query in the layer to update the map
+          layer.setSQL(query);
+        });
+      }
+      function main() {
+        cartodb.createVis('map', 'https://martirossello.cartodb.com/api/v2/viz/4acf88f0-4391-11e6-946f-0ea31932ec1d/viz.json', {
+          tiles_loader: true,
+          center_lat: 41.3931,
+          center_lon: 2.1734,
+          zoom: 14
+        })
+        .done(function(vis, layers) {
+          // layer 0 is the base layer, layer 1 is cartodb layer
+          var subLayer = layers[1].getSubLayer(0);
+          createSelector(subLayer);
+        })
+        .error(function(err) {
+          console.log(err);
+        });
+      }
+      window.onload = main;
+    </script> </p>
 			<p>Aliquam libero. Vivamus nisl nibh, iaculis vitae, viverra sit amet, ullamcorper vitae, turpis. Aliquam erat volutpat. Vestibulum dui sem, pulvinar sed, imperdiet nec, iaculis nec, leo. Fusce odio. Etiam arcu dui, faucibus eget, placerat vel, sodales eget, orci. Donec ornare neque ac sem. Mauris aliquet. Aliquam sem leo, vulputate sed, convallis at, ultricies quis, justo. Donec nonummy magna quis risus. Quisque eleifend. Phasellus tempor vehicula justo. Aliquam lacinia metus ut elit. Suspendisse iaculis mauris nec lorem. Donec leo. Vivamus fermentum nibh in augue. Praesent a lacus at urna congue rutrum. Nulla enim eros, porttitor eu, tempus id, varius non, nibh. </p>
 			<p>Donec condimentum, urna non molestie semper, ligula enim ornare nibh, quis laoreet eros quam eget ante. Aliquam libero. Vivamus nisl nibh, iaculis vitae, viverra sit amet, ullamcorper vitae, turpis. Aliquam erat volutpat. Vestibulum dui sem, pulvinar sed, imperdiet nec, iaculis nec, leo. Fusce odio. Etiam arcu dui, faucibus eget, placerat vel, sodales eget, orci. Donec ornare neque ac sem. Mauris aliquet. Aliquam sem leo, vulputate sed, convallis at, ultricies quis, justo. Donec nonummy magna quis risus. Quisque eleifend. Phasellus tempor vehicula justo.</p>
 			<p>Donec condimentum, urna non molestie semper, ligula enim ornare nibh, quis laoreet eros quam eget ante. Aliquam libero. Vivamus nisl nibh, iaculis vitae, viverra sit amet, ullamcorper vitae, turpis. Aliquam erat volutpat. Vestibulum dui sem, pulvinar sed, imperdiet nec, iaculis nec, leo. Fusce odio. Etiam arcu dui, faucibus eget, placerat vel, sodales eget, orci. Donec ornare neque ac sem. Mauris aliquet. Aliquam sem leo, vulputate sed, convallis at, ultricies quis, justo. Donec nonummy magna quis risus. Quisque eleifend. Phasellus tempor vehicula justo.</p>
